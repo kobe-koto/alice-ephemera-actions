@@ -1,0 +1,28 @@
+{
+  "name": "alice-ephemera-actions",
+  "version": "1.0.0",
+  "description": "Use an Alice.sh Ephemera instance as an on-demand, ephemeral GitHub Actions self-hosted runner.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist --source-map --license licenses.txt",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@vercel/ncc": "^0.38.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

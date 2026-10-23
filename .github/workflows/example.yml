@@ -1,0 +1,53 @@
+name: Example — Alice Ephemera runner
+
+# Example of using an Alice.sh Ephemera instance as an on-demand self-hosted
+# runner. Copy this into your own repo and adjust the plan/os to your account.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  start-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      instance-id: ${{ steps.start.outputs.instance-id }}
+      runner-name: ${{ steps.start.outputs.runner-name }}
+    steps:
+      - id: start
+        uses: ./
+        with:
+          mode: start
+          alice-client-id: ${{ secrets.ALICE_CLIENT_ID }}
+          alice-secret: ${{ secrets.ALICE_SECRET }}
+          github-token: ${{ secrets.GH_RUNNER_TOKEN }}
+          plan: ${{ vars.ALICE_PLAN }}
+          os: ${{ vars.ALICE_OS }}
+          time: 1
+          labels: self-hosted,alice-ephemera,${{ github.run_id }}
+
+  do-the-work:
+    needs: start-runner
+    runs-on:
+      - self-hosted
+      - alice-ephemera
+      - ${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: |
+          echo "Hello from Alice Ephemera!"
+          uname -a
+          nproc
+
+  stop-runner:
+    needs: [start-runner, do-the-work]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: ./
+        with:
+          mode: stop
+          alice-client-id: ${{ secrets.ALICE_CLIENT_ID }}
+          alice-secret: ${{ secrets.ALICE_SECRET }}
+          github-token: ${{ secrets.GH_RUNNER_TOKEN }}
+          instance-id: ${{ needs.start-runner.outputs.instance-id }}
+          runner-name: ${{ needs.start-runner.outputs.runner-name }}

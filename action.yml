@@ -1,0 +1,95 @@
+name: 'Alice Ephemera Runner'
+description: >-
+  Start or stop an Alice.sh Ephemera instance as an on-demand, ephemeral
+  GitHub Actions self-hosted runner.
+author: 'alice-ephemera-actions'
+branding:
+  icon: 'cpu'
+  color: 'purple'
+
+inputs:
+  mode:
+    description: '"start" to deploy a runner, "stop" to destroy it.'
+    required: true
+  alice-client-id:
+    description: 'Alice.sh API Client ID.'
+    required: true
+  alice-secret:
+    description: 'Alice.sh API Secret.'
+    required: true
+  github-token:
+    description: >-
+      GitHub token (PAT or app token) with permission to manage self-hosted
+      runners for the repository or organization.
+    required: true
+  organization:
+    description: >-
+      Organization login to register an org-level runner. Omit to register a
+      repository-level runner for the current repo.
+    required: false
+
+  # --- start inputs ---
+  plan-id:
+    description: 'Alice plan (product) id. Alternative to `plan`.'
+    required: false
+  plan:
+    description: 'Alice plan name, resolved to an id via the API.'
+    required: false
+  os-id:
+    description: 'Alice OS image id. Alternative to `os`.'
+    required: false
+  os:
+    description: 'Alice OS image name, resolved to an id via the API.'
+    required: false
+  time:
+    description: 'Instance lifetime in hours.'
+    required: false
+    default: '1'
+  ssh-key-id:
+    description: 'Optional Alice SSH key id to inject.'
+    required: false
+  runner-version:
+    description: 'GitHub Actions runner release to install (without the "v").'
+    required: false
+    default: '2.321.0'
+  arch:
+    description: 'Runner architecture: x64, arm64 or arm.'
+    required: false
+    default: 'x64'
+  labels:
+    description: >-
+      Comma-separated runner labels. Defaults to
+      "self-hosted,alice-ephemera". Use a unique label to target this runner.
+    required: false
+  runner-group:
+    description: 'Runner group for org-level runners.'
+    required: false
+  pre-runner-script:
+    description: 'Shell commands to run on the instance before configuring the runner.'
+    required: false
+  wait-timeout:
+    description: 'Seconds to wait for the instance and runner to come online.'
+    required: false
+    default: '600'
+
+  # --- stop inputs ---
+  instance-id:
+    description: 'Alice instance id to destroy (required for mode=stop).'
+    required: false
+  runner-name:
+    description: 'Runner name to deregister (optional for mode=stop).'
+    required: false
+
+outputs:
+  instance-id:
+    description: 'Id of the deployed Alice instance.'
+  runner-name:
+    description: 'Name of the registered runner.'
+  instance-ipv4:
+    description: 'IPv4 address of the instance, if assigned.'
+  instance-ipv6:
+    description: 'IPv6 address of the instance, if assigned.'
+
+runs:
+  using: 'node24'
+  main: 'dist/index.js'
